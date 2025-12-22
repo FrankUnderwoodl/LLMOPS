@@ -1,0 +1,67 @@
+# Ignore Flask specific files
+instance/
+.flaskenv
+
+# Ignore Python specific files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+*.so
+*.orig
+*.rej
+*.bak
+*.pot
+*.pyc
+*.mo
+*.log
+*.csv
+*.sqlite3
+*.db
+*.lock
+*.prof
+*.egg
+*.egg-info
+*.manifest
+*.spec
+*.sage.py
+*.swp
+*.swo
+*.swn
+*.sypy
+*.sypyc
+*.sage
+*.sobj
+*.spydata
+*.ipynb_checkpoints/
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.iml
+*.ipynb_checkpoints/
+
+# Ignore environment variables
+.env
+.env.local
+.env.*.local
+
+# Ignore test caches
+.pytest_cache/
+.tox/
+.coverage
+.nosetests.xml
+.hypothesis/
+pytestdebug.log
+nosetests.xml
+coverage.xml
+htmlcov/
+
+# Ignore build artifacts
+*.egg-info/
+dist/
+build/
