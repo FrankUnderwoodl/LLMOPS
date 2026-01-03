@@ -28,7 +28,12 @@ class Router:
         # 2.将url和视图函数进行绑定给蓝图
         bp.add_url_rule("/ping", view_func=self.app_handler.ping)
         bp.add_url_rule("/app/completion", methods = ["POST"], view_func=self.app_handler.chatToChatGPT)
+
+        # 对数据库进行CRUD操作的路由
         bp.add_url_rule("/app/create", methods = ["POST"], view_func=self.app_handler.create_app)
+        bp.add_url_rule("/app/<uuid:id>", view_func=self.app_handler.get_app)
+        bp.add_url_rule("/app/<uuid:id>", methods=["POST"], view_func=self.app_handler.update_app)
+        bp.add_url_rule("/app/<uuid:id>/delete", methods=["POST"], view_func=self.app_handler.delete_app)
 
         # 3.将蓝图注册到app程序中
         app.register_blueprint(bp)

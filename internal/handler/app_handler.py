@@ -2,19 +2,22 @@
 @author: Lzm
 @date: 2025年12月01日
 """
+import uuid
 from dataclasses import dataclass
 
 from injector import inject
-from openai import OpenAI
+from langchain_community.chat_models import ChatOpenAI
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
 
 from internal.exception import FailException
 from internal.schema.app_schema import CompletionReq
 from internal.service.app_service import AppService
-from pkg.response import success_json, validate_error_json
+from pkg.response import success_json, validate_error_json, success_message
 
 
-@dataclass
 @inject
+@dataclass
 class AppHandler:
     """应用控制器"""
 
@@ -23,7 +26,19 @@ class AppHandler:
     def create_app(self):
         """调用service层创建一个应用(其实就是往数据库插入一条记录)"""
         app = self.app_service.create_app()
-        return success_json({"app_id": str(app.id), "app_name": app.name})
+        return success_message({"app_id": str(app.id), "app_name": app.name})
+
+    def get_app(self, id: uuid.UUID):
+        app = self.app_service.get_app(id)
+        return success_message(f"应用已经成功获取，名字是{app.name}")
+
+    def update_app(self, id: uuid.UUID):
+        app = self.app_service.update_app(id)
+        return success_message(f"应用已经成功修改，修改的名字是:{app.name}")
+
+    def delete_app(self, id: uuid.UUID):
+        app = self.app_service.delete_app(id)
+        return success_message(f"应用已经成功删除，id为:{app.id}")
 
     def chatToChatGPT(self):
         """与ChatGPT进行对话的接口"""
@@ -33,24 +48,14 @@ class AppHandler:
         if not req.validate():
             return validate_error_json(req.errors)
 
-        # extract the query value from the req object
-        user_query = req.query.data
+        # 2.编写提示词
+        prompt = ChatPromptTemplate.from_template("{query}")
+        llm = ChatOpenAI(model="gpt-3.5-turbo")
+        parser = StrOutputParser()
 
-        # 2. 调用ChatGPT API获取响应
-        client = OpenAI()
-        # 3. 返回响应给用户
-        # noinspection PyTypeChecker
-        completion = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system",
-                 "content": "你是OpenAI开发的聊天机器人，请根据用户的输入回复对应的信息，请你在结果最后面加上‘——Lzm’"},
-                {"role": "user", "content": user_query},
-            ])
-        content = completion.choices[0].message.content
-
-        # 封装进固定格式返回
-        # resp = Response(code=HTTPCode.SUCCESS, message="请求成功", data={"content": content})
+        # 3.创建链
+        chain = prompt | llm | parser
+        content = chain.invoke({"query": req.query})
 
         return success_json({"content": content})
 

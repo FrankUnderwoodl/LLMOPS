@@ -4,6 +4,9 @@
 """
 
 from internal.extension.database_extension import db
+from internal.extension.migrate_extention import migrate
 
-__all__ = ["db"]
+__all__ = ["db", "migrate"]
+
+
 
